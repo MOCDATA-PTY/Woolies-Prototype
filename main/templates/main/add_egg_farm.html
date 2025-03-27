@@ -1,0 +1,318 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Egg Farm Record</title>
+    <style>
+        :root {
+            --primary-color: #1a1a1a;
+            --secondary-color: #f4f4f4;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --border-color: #e0e0e0;
+            --hover-bg: #f9f9f9;
+            --shadow-subtle: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary-color);
+            background-image: url('{% static "img/HD-wallpaper-black-dark-gray-gray.jpg" %}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .page-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .back-btn {
+            padding: 8px 16px;
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px var(--shadow-subtle);
+            padding: 40px;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        input, 
+        select, 
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #333;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .validation-error {
+            border-color: #d32f2f;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 20px;
+                padding: 30px 20px;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="header">
+            <div class="header-title">Add Egg Farm Record</div>
+            <a href="{% url 'home' %}" class="back-btn">← Back</a>
+        </div>
+
+        <div class="container">
+            <form id="egg-farm-form" method="POST" action="{% url 'add_egg_farm' %}">
+                {% csrf_token %}
+
+                <!-- Step 1: Farm Identification -->
+                <div class="form-step active" data-step="1">
+                    <h2>Farm Identification</h2>
+                    {% for field in form.visible_fields|slice:":4" %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                {% for error in field.errors %}
+                                    <div class="error-message">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="navigation-buttons">
+                        <button type="button" class="btn btn-primary next-step">Next →</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Hen Population & Production -->
+                <div class="form-step" data-step="2">
+                    <h2>Hen Population & Production</h2>
+                    {% for field in form.visible_fields|slice:"4:17" %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                {% for error in field.errors %}
+                                    <div class="error-message">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="navigation-buttons">
+                        <button type="button" class="btn btn-secondary prev-step">← Previous</button>
+                        <button type="button" class="btn btn-primary next-step">Next →</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Nutrition & Health -->
+                <div class="form-step" data-step="3">
+                    <h2>Nutrition & Health</h2>
+                    {% for field in form.visible_fields|slice:"17:30" %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                {% for error in field.errors %}
+                                    <div class="error-message">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="navigation-buttons">
+                        <button type="button" class="btn btn-secondary prev-step">← Previous</button>
+                        <button type="button" class="btn btn-primary next-step">Next →</button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Distribution & Submission -->
+                <div class="form-step" data-step="4">
+                    <h2>Market & Distribution</h2>
+                    {% for field in form.visible_fields|slice:"30:" %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                {% for error in field.errors %}
+                                    <div class="error-message">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="navigation-buttons">
+                        <button type="button" class="btn btn-secondary prev-step">← Previous</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const steps = document.querySelectorAll('.form-step');
+        const nextBtns = document.querySelectorAll('.next-step');
+        const prevBtns = document.querySelectorAll('.prev-step');
+        let stepIndex = 0;
+
+        function validateStep(stepElement) {
+            const inputs = stepElement.querySelectorAll('input, select, textarea');
+            let isValid = true;
+
+            inputs.forEach(input => {
+                input.classList.remove('validation-error');
+
+                if (input.hasAttribute('required') && !input.value.trim()) {
+                    input.classList.add('validation-error');
+                    isValid = false;
+                }
+
+                if (input.tagName === 'SELECT' && input.value === '') {
+                    input.classList.add('validation-error');
+                    isValid = false;
+                }
+            });
+
+            return isValid;
+        }
+
+        function showStep(index) {
+            steps.forEach((s, i) => s.classList.toggle('active', i === index));
+        }
+
+        nextBtns.forEach((btn, index) => btn.addEventListener('click', () => {
+            const currentStep = steps[stepIndex];
+            
+            if (validateStep(currentStep)) {
+                if (stepIndex < steps.length - 1) {
+                    stepIndex++;
+                    showStep(stepIndex);
+                }
+            } else {
+                alert('Please fill in all required fields before proceeding.');
+            }
+        }));
+
+        prevBtns.forEach(btn => btn.addEventListener('click', () => {
+            if (stepIndex > 0) {
+                stepIndex--;
+                showStep(stepIndex);
+            }
+        }));
+    </script>
+</body>
+</html>

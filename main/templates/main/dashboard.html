@@ -1,0 +1,452 @@
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Woolworths Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #000000;
+            --accent: #4CAF50;
+            --grey: #444;
+            --background: #f9f9f9;
+            --text: #111;
+            --border: #ccc;
+            --shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        body {
+            background: url("{% static 'images/farm_bg.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Segoe UI', sans-serif;
+            color: var(--text);
+            margin: 0;
+            backdrop-filter: brightness(0.95);
+        }
+
+        .wool-header {
+            background: var(--primary);
+            color: white;
+            padding: 24px 30px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .wool-header img {
+            height: 36px;
+        }
+
+        .container {
+            padding: 18px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .filter-container {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .kpi-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .kpi-card {
+            flex: 1;
+            text-align: center;
+            background: white;
+            border-left: 4px solid var(--accent);
+            padding: 10px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .chart-box {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 12px;
+            box-shadow: var(--shadow);
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chart-box canvas {
+            max-height: 250px;
+            width: 100%;
+        }
+
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wool-header">
+   
+    <a href="{% url 'home' %}" class="btn btn-light fw-semibold border border-dark shadow-sm px-3 py-2">
+        <i class="fas fa-arrow-left me-2"></i> Back
+    </a>
+</div>
+
+<div class="container">
+    <div class="filter-container">
+        <form method="get" class="filter-form">
+            <div class="row">
+                <div class="col-md-3">
+                    <label>Farm Name</label>
+                    <select name="farm" class="form-control">
+                        <option value="">All Farms</option>
+                        {% for farm in farm_names %}
+                            <option value="{{ farm }}" {% if request.GET.farm == farm %}selected{% endif %}>{{ farm }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label>Site Name</label>
+                    <select name="site_name" class="form-control">
+                        <option value="">All Sites</option>
+                        {% for site in site_names %}
+                            <option value="{{ site }}" {% if request.GET.site_name == site %}selected{% endif %}>{{ site }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label>Breed</label>
+                    <select name="breed" class="form-control">
+                        <option value="">All Breeds</option>
+                        {% for breed_value, breed_name in breed_choices %}
+                            <option value="{{ breed_value }}" {% if request.GET.breed == breed_value %}selected{% endif %}>{{ breed_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label>Health Status</label>
+                    <select name="health_status" class="form-control">
+                        <option value="">All Statuses</option>
+                        {% for status_value, status_name in health_choices %}
+                            <option value="{{ status_value }}" {% if request.GET.health_status == status_value %}selected{% endif %}>{{ status_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    <label>Min Hens</label>
+                    <input type="number" name="min_hens" class="form-control" value="{{ request.GET.min_hens }}">
+                </div>
+                <div class="col-md-3">
+                    <label>Max Hens</label>
+                    <input type="number" name="max_hens" class="form-control" value="{{ request.GET.max_hens }}">
+                </div>
+                <div class="col-md-3">
+                    <label>Min Weekly Production</label>
+                    <input type="number" step="0.1" name="min_production" class="form-control" value="{{ request.GET.min_production }}">
+                </div>
+                <div class="col-md-3">
+                    <label>Max Weekly Production</label>
+                    <input type="number" step="0.1" name="max_production" class="form-control" value="{{ request.GET.max_production }}">
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    <label>Min Age (Weeks)</label>
+                    <input type="number" step="0.1" name="min_age" class="form-control" value="{{ request.GET.min_age }}">
+                </div>
+                <div class="col-md-3">
+                    <label>Max Age (Weeks)</label>
+                    <input type="number" step="0.1" name="max_age" class="form-control" value="{{ request.GET.max_age }}">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- KPI Section -->
+    <div class="kpi-row">
+        <div class="kpi-card">
+            <h6>Total Farms</h6>
+            <h4>{{ total_farms|default:"N/A" }}</h4>
+        </div>
+        <div class="kpi-card">
+            <h6>Total Hens</h6>
+            <h4>{{ total_hens|default:"N/A" }}</h4>
+        </div>
+        <div class="kpi-card">
+            <h6>Avg Age (wks)</h6>
+            <h4>{{ average_age|default:"N/A" }}</h4>
+        </div>
+        <div class="kpi-card">
+            <h6>Weekly Production</h6>
+            <h4>{{ total_weekly_production|default:"N/A" }}</h4>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+        <div class="chart-box">
+            <div class="d-flex justify-content-between align-items-center w-100 mb-2">
+                <h5 class="card-title m-0">📈 Advanced Forecast</h5>
+                <select id="forecastRangeSelect" class="form-select form-select-sm w-auto">
+                    <option value="4w">Next 4 Weeks</option>
+                    <option value="8w">Next 8 Weeks</option>
+                    <option value="12w">Next 12 Weeks</option>
+                    <option value="1m">Next 1 Month</option>
+                    <option value="3m">Next 3 Months</option>
+                    <option value="6m">Next 6 Months</option>
+                </select>
+            </div>
+            <canvas id="weeklyForecastChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h5 class="card-title">🥚 Egg Size</h5>
+            <canvas id="eggSizeChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h5 class="card-title">💧 Feed vs Water</h5>
+            <canvas id="feedWaterChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h5 class="card-title">📊 Breed</h5>
+            <canvas id="breedChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h5 class="card-title">☠️ Mortality</h5>
+            <canvas id="mortalityCullChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h5 class="card-title">🥇 Egg Quality</h5>
+            <canvas id="eggQualityChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    const selectedFarm = "{{ request.GET.farm|default:'' }}";
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderForecastChart();
+
+        const forecastSelector = document.getElementById('forecastRangeSelect');
+        forecastSelector.addEventListener('change', () => {
+            renderForecastChart(forecastSelector.value);
+        });
+
+        renderAllCharts();
+        renderEggSizeChart();
+    });
+
+    async function fetchChartData(url) {
+        const farmParam = selectedFarm ? `&farm=${encodeURIComponent(selectedFarm)}` : '';
+        const response = await fetch(url + farmParam);
+        return await response.json();
+    }
+
+    async function renderForecastChart(range = "4w") {
+        try {
+            const url = `{% url 'weekly_forecast_data' %}?range=${range}`;
+            const data = await fetchChartData(url);
+
+            const ctx = document.getElementById('weeklyForecastChart').getContext('2d');
+            if (window.forecastChart instanceof Chart) window.forecastChart.destroy();
+
+            window.forecastChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Actual Production',
+                            data: data.actual,
+                            borderColor: '#4CAF50',
+                            backgroundColor: getGradient(ctx, '#4CAF50'),
+                            tension: 0.4,
+                            fill: true,
+                            spanGaps: true,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'Forecasted Production',
+                            data: data.forecast,
+                            borderColor: '#FF9800',
+                            backgroundColor: getGradient(ctx, '#FF9800'),
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            fill: true,
+                            spanGaps: true,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Actual vs Forecasted Weekly Egg Production'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.dataset.label || '';
+                                    const value = context.parsed.y !== null ? context.parsed.y.toLocaleString() : '-';
+                                    return `${label}: ${value}`;
+                                },
+                                afterLabel: function(context) {
+                                    return context.dataset.label.includes("Forecast") ? '← Forecasted value' : '';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Eggs'
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (err) {
+            console.error("Error rendering forecast chart:", err);
+        }
+    }
+
+    function getGradient(ctx, color) {
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, color);
+        gradient.addColorStop(1, 'rgba(255,255,255,0)');
+        return gradient;
+    }
+
+    async function renderAllCharts() {
+        const data = await fetchChartData("{% url 'dashboard_analytics_data' %}");
+        renderFeedWater(data.feed_vs_water);
+        renderBreed(data.breed_distribution);
+        renderMortality(data.mortality_cull);
+        renderQuality(data.egg_quality);
+    }
+
+    function renderFeedWater(data) {
+        const ctx = document.getElementById('feedWaterChart').getContext('2d');
+        if (window.feedChart instanceof Chart) window.feedChart.destroy();
+        window.feedChart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [{ label: 'Feed vs Water', data: data.map(p => ({ x: p[0], y: p[1] })), backgroundColor: '#444' }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Feed (g/day)' } },
+                    y: { title: { display: true, text: 'Water (L/day)' } }
+                }
+            }
+        });
+    }
+
+    function renderBreed(breed) {
+        const ctx = document.getElementById('breedChart').getContext('2d');
+        if (window.breedChart instanceof Chart) window.breedChart.destroy();
+        window.breedChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: breed.labels,
+                datasets: [{ data: breed.data, backgroundColor: ['#111', '#333', '#777', '#aaa', '#ccc'] }]
+            },
+            options: { responsive: true }
+        });
+    }
+
+    function renderMortality(data) {
+        const ctx = document.getElementById('mortalityCullChart').getContext('2d');
+        if (window.mortalityChart instanceof Chart) window.mortalityChart.destroy();
+        window.mortalityChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.labels,
+                datasets: [
+                    { label: 'Mortality (%)', data: data.mortality, backgroundColor: '#222' },
+                    { label: 'Culled', data: data.culled, backgroundColor: '#aaa' }
+                ]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+    }
+
+    function renderQuality(data) {
+        const ctx = document.getElementById('eggQualityChart').getContext('2d');
+        if (window.qualityChart instanceof Chart) window.qualityChart.destroy();
+        window.qualityChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Defective (%)', 'First Grade (%)'],
+                datasets: [{ data: [data.defective, data.first_grade], backgroundColor: ['#333', '#ccc'] }]
+            },
+            options: { indexAxis: 'y', responsive: true }
+        });
+    }
+
+    function renderEggSizeChart() {
+        const ctx = document.getElementById('eggSizeChart').getContext('2d');
+        if (window.eggSizeChart instanceof Chart) window.eggSizeChart.destroy();
+        window.eggSizeChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Small', 'Medium', 'Large', 'XL', 'Jumbo'],
+                datasets: [{
+                    data: [
+                        {{ egg_size_distribution.small|default:"0" }},
+                        {{ egg_size_distribution.medium|default:"0" }},
+                        {{ egg_size_distribution.large|default:"0" }},
+                        {{ egg_size_distribution.extra_large|default:"0" }},
+                        {{ egg_size_distribution.jumbo|default:"0" }}
+                    ],
+                    backgroundColor: ['#111', '#444', '#777', '#aaa', '#ddd']
+                }]
+            },
+            options: { responsive: true }
+        });
+    }
+</script>
+</body>
+</html>
+{% endblock %}

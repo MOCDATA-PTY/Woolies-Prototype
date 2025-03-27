@@ -1,0 +1,205 @@
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Management</title>
+    <style>
+        :root {
+            --primary-color: #1a1a1a;
+            --secondary-color: #f4f4f4;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --border-color: #e0e0e0;
+            --hover-bg: #f9f9f9;
+            --shadow-subtle: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary-color);
+            background-image: url('{% static "img/HD-wallpaper-black-dark-gray-gray.jpg" %}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 16px var(--shadow-subtle);
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: rgba(244, 244, 244, 0.9);
+        }
+
+        .header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .add-user-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-user-btn:hover {
+            background-color: #333;
+        }
+
+        .add-user-btn svg {
+            stroke: white;
+        }
+
+        .table-container {
+            padding: 30px;
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .user-table th {
+            background-color: rgba(244, 244, 244, 0.9);
+            text-align: left;
+            padding: 15px;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .user-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 16px;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .user-table tr:hover {
+            background-color: rgba(249, 249, 249, 0.9);
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .action-link {
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .action-link:hover {
+            color: var(--primary-color);
+        }
+
+        .action-link.edit { color: var(--text-primary); }
+        .action-link.delete { color: #d32f2f; }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: var(--text-secondary);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="container">
+            <div class="header">
+                <h2>User Management</h2>
+                <a href="{% url 'create_user' %}" class="add-user-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Add New User
+                </a>
+            </div>
+
+            <div class="table-container">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <div class="actions">
+                                    <a href="{% url 'edit_user' user.id %}" class="action-link edit">Edit</a>
+                                    <a href="{% url 'edit_user_password' user.id %}" class="action-link">Change Password</a>
+                                    <a href="{% url 'delete_user' user.id %}" class="action-link delete">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="empty-state">
+                                No users found. Click "Add New User" to get started.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}
