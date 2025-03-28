@@ -1,13 +1,11 @@
 {% load static %}
-{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Create Account</title>
     <style>
-        /* Global Reset */
         * {
             margin: 0;
             padding: 0;
@@ -15,8 +13,8 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: url("{% static 'img/Pricing Report Page 1.png' %}") no-repeat center center fixed;
+            font-family: Arial, sans-serif;
+            background: url("{% static 'img/HD-wallpaper-black-dark-gray-gray.jpg' %}") no-repeat center center fixed;
             background-size: cover;
             color: white;
             height: 100vh;
@@ -29,7 +27,7 @@
         .container {
             width: 100%;
             max-width: 480px;
-            background-color: rgba(0, 0, 0, 0.7); /* Transparent dark background */
+            background-color: rgba(0, 0, 0, 0.7);
             border-radius: 10px;
             padding: 40px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
@@ -50,12 +48,10 @@
 
         .message.success {
             background-color: #4CAF50;
-            color: white;
         }
 
         .message.error {
             background-color: #f44336;
-            color: white;
         }
 
         .form-group {
@@ -83,14 +79,14 @@
 
         .form-group input:focus {
             outline: none;
-            border-color: #00bcd4; /* Highlight color */
-            box-shadow: 0 0 8px rgba(0, 188, 212, 0.6);
+            border-color: #666;
+            box-shadow: none;
         }
 
         button {
             width: 100%;
             padding: 12px;
-            background-color: #00bcd4;
+            background-color: #444;
             color: white;
             border: none;
             border-radius: 8px;
@@ -100,7 +96,7 @@
         }
 
         button:hover {
-            background-color: #008c9e;
+            background-color: #555;
         }
 
         .register-link {
@@ -118,6 +114,17 @@
             text-decoration: underline;
         }
 
+        .text-red-500 {
+            color: #f44336;
+        }
+
+        .text-sm {
+            font-size: 14px;
+        }
+
+        .mt-1 {
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -134,7 +141,7 @@
             </div>
         {% endif %}
 
-        <form method="POST" class="space-y-6">
+        <form method="POST">
             {% csrf_token %}
             {% for field in form %}
                 <div class="form-group">
@@ -149,15 +156,14 @@
                     {% endif %}
                 </div>
             {% endfor %}
-            
+
             <button type="submit">Register</button>
         </form>
 
         <div class="register-link">
-            Already have an account? 
+            Already have an account?
             <a href="{% url 'login' %}">Sign in here</a>
         </div>
     </div>
 </body>
 </html>
-{% endblock %}
