@@ -477,7 +477,8 @@
             </div>
             <div class="kpi-card">
                 <h6>Weekly Production</h6>
-                <h4>{{ total_weekly_production|default:"0" }}</h4>
+                <h4>{{ total_weekly_production|default:"0"|add:"0" }}</h4>
+
             </div>
         </div>
 
