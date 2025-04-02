@@ -21,6 +21,7 @@ from .views import (
     edit_user,
     create_user,
       import_egg_farms,test_dashboard,
+      prophet_forecast_view
 )
 
 urlpatterns = [
@@ -58,6 +59,8 @@ urlpatterns = [
     path('edit_user_password/<int:user_id>/', edit_user_password, name='edit_user_password'),  # Change password
     path('delete_user/<int:user_id>/', delete_user, name='delete_user'),  # Delete user
     path('dashboard/test/', test_dashboard, name='dashboard_test'),
+    path('forecast/prophet/', prophet_forecast_view, name='prophet_forecast'),
+
     
 
 ]

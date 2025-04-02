@@ -80,6 +80,7 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database (SQLite for Development)
 DATABASES = {
     'default': {
+        'ATOMIC_REQUESTS': True,
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'db.sqlite3',
     }

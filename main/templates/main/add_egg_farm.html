@@ -5,17 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Add Egg Farm Record</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #1a1a1a;
-            --secondary-color: #f4f4f4;
-            --text-primary: #333;
-            --text-secondary: #666;
-            --border-color: #e0e0e0;
-            --hover-bg: #f9f9f9;
-            --shadow-subtle: rgba(0, 0, 0, 0.1);
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -23,54 +14,119 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--secondary-color);
-            background-image: url('{% static "img/HD-wallpaper-black-dark-gray-gray.jpg" %}');
+            font-family: 'Inter', Arial, sans-serif;
+            background: url("{% static 'img/5489297.jpg' %}") no-repeat center center fixed;
             background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: var(--text-primary);
+            color: #fff;
+            min-height: 100vh;
             line-height: 1.6;
+            position: relative;
         }
 
-        .page-wrapper {
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+
+        .container {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
 
         .header {
-            background-color: var(--primary-color);
-            color: white;
+            background-color: rgba(17, 17, 17, 0.8);
+            color: #fff;
             padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid #333;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
         .header-title {
             font-size: 24px;
             font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            color: #fff;
         }
 
         .back-btn {
-            padding: 8px 16px;
-            background-color: white;
-            color: var(--primary-color);
-            border: 1px solid var(--primary-color);
-            border-radius: 4px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
             text-decoration: none;
-            font-weight: 500;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .container {
+        .back-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
             width: 100%;
-            max-width: 500px;
+            height: 100%;
+            background: linear-gradient(
+                120deg, 
+                transparent, 
+                rgba(255,255,255,0.2), 
+                transparent
+            );
+            transition: all 0.5s ease;
+        }
+
+        .back-btn:hover::after {
+            left: 100%;
+        }
+
+        .back-btn:hover {
+            background-color: #444;
+            box-shadow: 0 4px 15px rgba(255,255,255,0.2);
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 550px;
             margin: 40px auto;
-            background: white;
+            background-color: #111;
+            border: 1px solid #333;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            padding: 50px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             border-radius: 8px;
-            box-shadow: 0 4px 16px var(--shadow-subtle);
-            padding: 40px;
+        }
+
+        .form-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg, 
+                transparent, 
+                rgba(255,255,255,0.05), 
+                transparent
+            );
+            transform: rotate(-45deg);
+            pointer-events: none;
+        }
+
+        .form-container:hover {
+            box-shadow: 0 12px 28px rgba(255, 255, 255, 0.1);
         }
 
         .form-step {
@@ -89,7 +145,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: var(--text-secondary);
+            color: #ccc;
         }
 
         input, 
@@ -97,87 +153,128 @@
         textarea {
             width: 100%;
             padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
+            border: 1px solid #333;
+            border-radius: 6px;
             font-size: 16px;
+            background-color: #222;
+            color: #fff;
+            transition: all 0.2s ease;
+        }
+
+        input:focus, 
+        select:focus, 
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
         }
 
         .navigation-buttons {
             display: flex;
             justify-content: space-between;
             margin-top: 30px;
+            gap: 15px;
         }
 
         .btn {
-            padding: 12px 24px;
-            border-radius: 4px;
-            font-size: 16px;
-            font-weight: 500;
+            flex: 1;
+            padding: 14px;
+            border: none;
+            font-size: 17px;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border-radius: 6px;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg, 
+                transparent, 
+                rgba(255,255,255,0.2), 
+                transparent
+            );
+            transition: all 0.5s ease;
+        }
+
+        .btn:hover::after {
+            left: 100%;
         }
 
         .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
+            background-color: #e74c3c;
+            color: #fff;
         }
 
         .btn-primary:hover {
-            background-color: #333;
+            background-color: #c0392b;
+            box-shadow: 0 4px 15px rgba(231,76,60,0.3);
         }
 
         .btn-secondary {
-            background-color: transparent;
-            color: var(--text-secondary);
-            border: 1px solid var(--border-color);
+            background-color: #333;
+            color: #fff;
         }
 
         .btn-secondary:hover {
-            background-color: var(--hover-bg);
-            color: var(--text-primary);
+            background-color: #444;
+            box-shadow: 0 4px 15px rgba(255,255,255,0.2);
         }
 
         .error-message {
-            color: #d32f2f;
+            color: #ff6b6b;
             font-size: 14px;
             margin-top: 5px;
         }
 
         .validation-error {
-            border-color: #d32f2f;
+            border-color: #ff6b6b !important;
         }
 
         h2 {
             font-size: 24px;
             font-weight: 600;
-            color: var(--text-primary);
-            border-bottom: 2px solid var(--primary-color);
+            color: #fff;
+            border-bottom: 2px solid #e74c3c;
             padding-bottom: 10px;
             margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        @media (max-width: 600px) {
-            .container {
+        @media (max-width: 768px) {
+            .form-container {
                 margin: 20px;
                 padding: 30px 20px;
+                max-width: 95%;
             }
 
             .navigation-buttons {
                 flex-direction: column;
                 gap: 15px;
             }
+
+            .btn {
+                margin-top: 10px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="page-wrapper">
+    <div class="container">
         <div class="header">
             <div class="header-title">Add Egg Farm Record</div>
             <a href="{% url 'home' %}" class="back-btn">← Back</a>
         </div>
 
-        <div class="container">
+        <div class="form-container">
             <form id="egg-farm-form" method="POST" action="{% url 'add_egg_farm' %}">
                 {% csrf_token %}
 

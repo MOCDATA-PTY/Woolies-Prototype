@@ -4,202 +4,953 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>User Management</title>
+    <title>Egg Farm Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary-color: #1a1a1a;
-            --secondary-color: #f4f4f4;
-            --text-primary: #333;
-            --text-secondary: #666;
-            --border-color: #e0e0e0;
-            --hover-bg: #f9f9f9;
-            --shadow-subtle: rgba(0, 0, 0, 0.1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            --primary: #3498db;
+            --accent: #4CAF50;
+            --grey: #f0f0f0;
+            --background: #ffffff;
+            --text: #333;
+            --border: #ddd;
+            --shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--secondary-color);
-            background-image: url('{% static "img/HD-wallpaper-black-dark-gray-gray.jpg" %}');
+            background: url("{% static 'img/farm_bg.jpg' %}") no-repeat center center fixed;
             background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: var(--text-primary);
-            line-height: 1.6;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            color: var(--text);
+            margin: 0;
+            backdrop-filter: brightness(0.95);
         }
 
-        .page-wrapper {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 8px;
-            box-shadow: 0 4px 16px var(--shadow-subtle);
-            overflow: hidden;
-        }
-
-        .header {
+        .farm-header {
+            background: var(--primary);
+            color: white;
+            padding: 24px 30px;
+            box-shadow: var(--shadow);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 30px;
-            border-bottom: 1px solid var(--border-color);
-            background-color: rgba(244, 244, 244, 0.9);
         }
 
-        .header h2 {
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--text-primary);
+        .farm-header img {
+            height: 36px;
         }
 
-        .add-user-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 20px;
-            background-color: var(--primary-color);
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
+        .container {
+            padding: 18px;
+            max-width: 1600px;
+            margin: 0 auto;
         }
 
-        .add-user-btn:hover {
-            background-color: #333;
+        .filter-container {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
         }
 
-        .add-user-btn svg {
-            stroke: white;
-        }
-
-        .table-container {
-            padding: 30px;
-        }
-
-        .user-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .user-table th {
-            background-color: rgba(244, 244, 244, 0.9);
-            text-align: left;
-            padding: 15px;
-            font-size: 14px;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .user-table td {
-            padding: 15px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 16px;
-            background-color: rgba(255, 255, 255, 0.9);
-        }
-
-        .user-table tr:hover {
-            background-color: rgba(249, 249, 249, 0.9);
-        }
-
-        .actions {
+        .kpi-row {
             display: flex;
-            gap: 15px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
-        .action-link {
-            text-decoration: none;
-            font-weight: 500;
-            position: relative;
-            color: var(--text-secondary);
-            transition: color 0.3s ease;
-        }
-
-        .action-link:hover {
-            color: var(--primary-color);
-        }
-
-        .action-link.edit { color: var(--text-primary); }
-        .action-link.delete { color: #d32f2f; }
-
-        .empty-state {
+        .kpi-card {
+            flex: 1;
             text-align: center;
-            padding: 50px;
-            color: var(--text-secondary);
-            background-color: rgba(255, 255, 255, 0.9);
+            background: white;
+            border-left: 4px solid var(--accent);
+            padding: 10px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .chart-box {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 12px;
+            box-shadow: var(--shadow);
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .chart-box.big {
+            grid-column: span 2;
+            height: 400px;
+        }
+        
+        .chart-box.extra-big {
+            grid-column: span 3;
+            height: 500px;
+        }
+
+        .chart-box canvas {
+            max-height: 250px;
+            width: 100%;
+        }
+        
+        .chart-box.big canvas {
+            max-height: 350px;
+        }
+        
+        .chart-box.extra-big canvas {
+            max-height: 450px;
+        }
+
+        .error-msg {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            font-style: italic;
+            color: #666;
+        }
+
+        .forecast-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .forecast-stats {
+            font-size: 12px;
+            margin-top: 5px;
+            color: #666;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .forecast-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .forecast-method-selector {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .forecast-method-btn {
+            padding: 5px 10px;
+            font-size: 12px;
+            border: 1px solid var(--border);
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .forecast-method-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .chart-box.big {
+                grid-column: span 1;
+            }
+            
+            .chart-box.extra-big {
+                grid-column: span 2;
+            }
         }
 
         @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
+            .charts-grid {
+                grid-template-columns: 1fr;
             }
 
-            .actions {
+            .kpi-row {
                 flex-direction: column;
             }
+            
+            .chart-box.extra-big {
+                grid-column: span 1;
+            }
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            margin-right: 5px;
+            border-radius: 2px;
+        }
+        
+        .custom-legend {
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+            flex-wrap: wrap;
         }
     </style>
 </head>
 <body>
-    <div class="page-wrapper">
-        <div class="container">
-            <div class="header">
-                <h2>User Management</h2>
-                <a href="{% url 'create_user' %}" class="add-user-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    Add New User
-                </a>
-            </div>
 
-            <div class="table-container">
-                <table class="user-table">
-                    <thead>
-                        <tr>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in users %}
-                        <tr>
-                            <td>{{ user.username }}</td>
-                            <td>{{ user.email }}</td>
-                            <td>
-                                <div class="actions">
-                                    <a href="{% url 'edit_user' user.id %}" class="action-link edit">Edit</a>
-                                    <a href="{% url 'edit_user_password' user.id %}" class="action-link">Change Password</a>
-                                    <a href="{% url 'delete_user' user.id %}" class="action-link delete">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="3" class="empty-state">
-                                No users found. Click "Add New User" to get started.
-                            </td>
-                        </tr>
+<div class="farm-header">
+    <a href="{% url 'home' %}" class="btn btn-light fw-semibold border border-dark shadow-sm px-3 py-2">
+        <i class="fas fa-arrow-left me-2"></i> Back
+    </a>
+    <h4 class="m-0 text-center flex-grow-1">Egg Farm Analytics Dashboard</h4>
+</div>
+
+<div class="container">
+    <div class="filter-container">
+        <form method="get" class="filter-form" id="dashboardFilters">
+            <div class="row">
+                <div class="col-md-3">
+                    <label>Farm Name</label>
+                    <select name="farm" class="form-control">
+                        <option value="">All Farms</option>
+                        {% for farm in farm_names %}
+                            <option value="{{ farm }}" {% if request.GET.farm == farm %}selected{% endif %}>{{ farm }}</option>
                         {% endfor %}
-                    </tbody>
-                </table>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label>Site Name</label>
+                    <select name="site_name" class="form-control">
+                        <option value="">All Sites</option>
+                        {% for site in site_names %}
+                            <option value="{{ site }}" {% if request.GET.site_name == site %}selected{% endif %}>{{ site }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label>Breed</label>
+                    <select name="breed" class="form-control">
+                        <option value="">All Breeds</option>
+                        {% for breed_value, breed_name in breed_choices %}
+                            <option value="{{ breed_value }}" {% if request.GET.breed == breed_value %}selected{% endif %}>{{ breed_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label>Health Status</label>
+                    <select name="health_status" class="form-control">
+                        <option value="">All Statuses</option>
+                        {% for status_value, status_name in health_choices %}
+                            <option value="{{ status_value }}" {% if request.GET.health_status == status_value %}selected{% endif %}>{{ status_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    <label>Min Hens</label>
+                    <input type="number" name="min_hens" class="form-control" value="{{ request.GET.min_hens }}">
+                </div>
+                <div class="col-md-3">
+                    <label>Max Hens</label>
+                    <input type="number" name="max_hens" class="form-control" value="{{ request.GET.max_hens }}">
+                </div>
+                <div class="col-md-3">
+                    <label>Min Age (Weeks)</label>
+                    <input type="number" step="0.1" name="min_age" class="form-control" value="{{ request.GET.min_age }}">
+                </div>
+                <div class="col-md-3">
+                    <label>Max Age (Weeks)</label>
+                    <input type="number" step="0.1" name="max_age" class="form-control" value="{{ request.GET.max_age }}">
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-3 offset-md-9 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- KPI Section -->
+    <div class="kpi-row">
+        <div class="kpi-card">
+            <h6>Total Farms</h6>
+            <h4>{{ total_farms|default:"0" }}</h4>
+        </div>
+        <div class="kpi-card">
+            <h6>Total Hens</h6>
+            <h4>{{ total_hens|default:"0" }}</h4>
+        </div>
+        <div class="kpi-card">
+            <h6>Avg Age (wks)</h6>
+            <h4>{{ average_age|default:"0" }}</h4>
+        </div>
+        <div class="kpi-card">
+            <h6>Weekly Production</h6>
+            <h4>{{ total_weekly_production|default:"0" }}</h4>
         </div>
     </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+        <!-- Production Forecast - Advanced -->
+        <div class="chart-box extra-big">
+            <div class="forecast-controls">
+                <h5 class="card-title m-0">📈 Production Forecast</h5>
+                <div class="d-flex align-items-center">
+                    <div class="forecast-method-selector me-3">
+                        <button type="button" class="forecast-method-btn active" data-method="ensemble">Ensemble</button>
+                        <button type="button" class="forecast-method-btn" data-method="linear">Linear</button>
+                        <button type="button" class="forecast-method-btn" data-method="polynomial">Polynomial</button>
+                        <button type="button" class="forecast-method-btn" data-method="exponential">Exponential</button>
+                        <button type="button" class="forecast-method-btn" data-method="prophet">Prophet</button>
+                        <button type="button" class="forecast-method-btn" data-method="arima">ARIMA</button>
+                    </div>
+                    
+                    <select id="forecastRangeSelect" class="form-select form-select-sm w-auto">
+                        <option value="4w">Next 4 Weeks</option>
+                        <option value="8w">Next 8 Weeks</option>
+                        <option value="12w" selected>Next 12 Weeks</option>
+                        <option value="1m">Next Month</option>
+                        <option value="3m">Next 3 Months</option>
+                        <option value="6m">Next 6 Months</option>
+                    </select>
+                </div>
+            </div>
+            <div id="forecastChartContainer" class="w-100 h-100 d-flex justify-content-center align-items-center">
+                <div class="loading">Loading forecast data...</div>
+            </div>
+            <div id="forecastCustomLegend" class="custom-legend"></div>
+            <div id="forecast-stats" class="forecast-stats"></div>
+        </div>
+        
+        <div class="chart-box">
+            <h5 class="card-title">🥚 Egg Size Distribution</h5>
+            <canvas id="eggSizeChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h5 class="card-title">💧 Feed vs Water Consumption</h5>
+            <canvas id="feedWaterChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h5 class="card-title">📊 Breed Distribution</h5>
+            <canvas id="breedChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h5 class="card-title">☠️ Mortality & Culling</h5>
+            <canvas id="mortalityCullChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h5 class="card-title">🥇 Egg Quality</h5>
+            <canvas id="eggQualityChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Get current filter values
+    const currentFilters = {
+        farm: "{{ request.GET.farm|default:'' }}",
+        site_name: "{{ request.GET.site_name|default:'' }}",
+        breed: "{{ request.GET.breed|default:'' }}",
+        health_status: "{{ request.GET.health_status|default:'' }}"
+    };
+
+    // Store active forecasting method
+    let activeForecastMethod = 'ensemble';
+    
+    // Store forecast data for reuse
+    let cachedForecastData = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initCharts();
+        initForecastingControls();
+    });
+    
+    function initForecastingControls() {
+        // Forecast method selector
+        const methodButtons = document.querySelectorAll('.forecast-method-btn');
+        methodButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update button styles
+                methodButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Update active method
+                activeForecastMethod = btn.dataset.method;
+                
+                // Redraw chart with the new method if we have cached data
+                if (cachedForecastData) {
+                    displayForecastChart(cachedForecastData, activeForecastMethod);
+                }
+            });
+        });
+    }
+    
+    async function initCharts() {
+        await renderForecastChart();
+
+        const forecastSelector = document.getElementById('forecastRangeSelect');
+        forecastSelector.addEventListener('change', () => {
+            renderForecastChart(forecastSelector.value);
+        });
+
+        renderEggSizeChart();
+        await renderAllAnalyticsCharts();
+    }
+
+    async function fetchWithFilters(url) {
+        // Build URL with all current filters
+        const urlParams = new URLSearchParams(window.location.search);
+        const response = await fetch(`${url}?${urlParams.toString()}`);
+        return await response.json();
+    }
+
+    function getGradient(ctx, color) {
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, color);
+        gradient.addColorStop(1, 'rgba(255,255,255,0)');
+        return gradient;
+    }
+    
+    // Helper function to destroy existing chart if it exists
+    function destroyChartIfExists(chartInstance) {
+        if (chartInstance instanceof Chart) {
+            chartInstance.destroy();
+        }
+    }
+
+    async function renderForecastChart(range = "12w") {
+        try {
+            // Show loading state
+            const chartContainer = document.getElementById('forecastChartContainer');
+            chartContainer.innerHTML = '<div class="loading">Loading forecast data...</div>';
+            
+            // Reset statistics and legend
+            document.getElementById('forecast-stats').innerHTML = '';
+            document.getElementById('forecastCustomLegend').innerHTML = '';
+            
+            // Build URL with all current filters
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('range', range);
+            
+            const url = `{% url 'weekly_forecast_data' %}?${urlParams.toString()}`;
+            const data = await fetch(url).then(response => response.json());
+            
+            // Debug received data
+            console.log("Forecast data received:", data);
+            
+            // Cache the forecast data for method switching
+            cachedForecastData = data;
+            
+            // Check for errors
+            if (data.error) {
+                console.error("Forecast error:", data.error);
+                chartContainer.innerHTML = `<div class="error-msg">${data.error}</div>`;
+                return;
+            }
+            
+            // Display the forecast chart
+            displayForecastChart(data, activeForecastMethod);
+            
+        } catch (err) {
+            console.error("Error rendering forecast chart:", err);
+            document.getElementById('forecastChartContainer').innerHTML = 
+                `<div class="error-msg">Error loading forecast data: ${err.message}</div>`;
+        }
+    }
+    
+    function displayForecastChart(data, method) {
+        // Create canvas for chart if it doesn't exist
+        const chartContainer = document.getElementById('forecastChartContainer');
+        chartContainer.innerHTML = '<canvas id="weeklyForecastChart" style="width:100%; height:100%;"></canvas>';
+        const ctx = document.getElementById('weeklyForecastChart').getContext('2d');
+        
+        // Check if we have any forecasts
+        if (!data.forecasts || Object.keys(data.forecasts).length === 0) {
+            chartContainer.innerHTML = `<div class="error-msg">No forecast data available</div>`;
+            return;
+        }
+        
+        // Destroy existing chart if any
+        destroyChartIfExists(window.forecastChart);
+        
+        // Get the datasets to display based on selected method
+        let chartDatasets = [];
+        
+        // Add historical data
+        chartDatasets.push({
+            label: 'Historical Production',
+            data: data.actual,
+            borderColor: '#4CAF50',
+            backgroundColor: getGradient(ctx, 'rgba(76, 175, 80, 0.3)'),
+            tension: 0.4,
+            fill: true,
+            spanGaps: true,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            order: 1
+        });
+        
+        // Add forecasts based on method
+        if (method === 'ensemble' && data.forecasts.ensemble) {
+            // Add ensemble forecast
+            chartDatasets.push({
+                label: 'Ensemble Forecast',
+                data: data.forecasts.ensemble.forecast,
+                borderColor: '#3498db',
+                backgroundColor: getGradient(ctx, 'rgba(52, 152, 219, 0.2)'),
+                borderDash: [5, 5],
+                tension: 0.4,
+                fill: true,
+                spanGaps: true,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                order: 2
+            });
+            
+            // Add confidence intervals
+            chartDatasets.push({
+                label: 'Upper Bound (95%)',
+                data: data.forecasts.ensemble.upper_bound,
+                borderColor: 'rgba(52, 152, 219, 0.5)',
+                backgroundColor: 'transparent',
+                borderDash: [2, 2],
+                borderWidth: 1,
+                pointRadius: 0,
+                fill: false,
+                order: 3
+            });
+            
+            chartDatasets.push({
+                label: 'Lower Bound (95%)',
+                data: data.forecasts.ensemble.lower_bound,
+                borderColor: 'rgba(52, 152, 219, 0.5)',
+                backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                borderDash: [2, 2],
+                borderWidth: 1,
+                pointRadius: 0,
+                fill: '-1',
+                order: 4
+            });
+            
+            // Update statistics
+            if (data.forecasts.ensemble.stats) {
+                const statsDiv = document.getElementById('forecast-stats');
+                statsDiv.innerHTML = `
+                    <small>
+                        Ensemble forecast (${data.forecasts.ensemble.name}) | 
+                        RMSE: ${data.forecasts.ensemble.stats.rmse} | 
+                        Historical data points: ${data.actual.filter(v => v !== null).length}
+                    </small>
+                `;
+            }
+        } else {
+            // Add individual forecast method
+            let forecastMethod = method;
+if (method === 'exponential') forecastMethod = 'holt_winters';
+if (method === 'prophet') forecastMethod = 'prophet';
+if (method === 'arima') forecastMethod = 'arima';
+
+            
+            if (data.forecasts[forecastMethod]) {
+                chartDatasets.push({
+                    label: `${data.forecasts[forecastMethod].name} Forecast`,
+                    data: data.forecasts[forecastMethod].forecast,
+                    borderColor: '#3498db',
+                    backgroundColor: getGradient(ctx, 'rgba(52, 152, 219, 0.2)'),
+                    borderDash: [5, 5],
+                    tension: 0.4,
+                    fill: true,
+                    spanGaps: true,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    order: 2
+                });
+                
+                // Add confidence intervals if available
+                if (data.forecasts[forecastMethod].upper_bound) {
+                    chartDatasets.push({
+                        label: 'Upper Bound (95%)',
+                        data: data.forecasts[forecastMethod].upper_bound,
+                        borderColor: 'rgba(52, 152, 219, 0.5)',
+                        backgroundColor: 'transparent',
+                        borderDash: [2, 2],
+                        borderWidth: 1,
+                        pointRadius: 0,
+                        fill: false,
+                        order: 3
+                    });
+                    
+                    chartDatasets.push({
+                        label: 'Lower Bound (95%)',
+                        data: data.forecasts[forecastMethod].lower_bound,
+                        borderColor: 'rgba(52, 152, 219, 0.5)',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderDash: [2, 2],
+                        borderWidth: 1,
+                        pointRadius: 0,
+                        fill: '-1',
+                        order: 4
+                    });
+                }
+                
+                // Update statistics
+                if (data.forecasts[forecastMethod].stats) {
+                    const statsDiv = document.getElementById('forecast-stats');
+                    statsDiv.innerHTML = `
+                        <small>
+                            ${data.forecasts[forecastMethod].name} forecast | 
+                            RMSE: ${data.forecasts[forecastMethod].stats.rmse} | 
+                            Historical data points: ${data.actual.filter(v => v !== null).length}
+                        </small>
+                    `;
+                }
+            } else {
+                // No data for this method, show a message
+                const statsDiv = document.getElementById('forecast-stats');
+                statsDiv.innerHTML = `
+                    <small class="text-danger">
+                        No forecast data available for ${method} method. Showing ensemble forecast instead.
+                    </small>
+                `;
+                
+                // Show ensemble forecast as fallback
+                if (data.forecasts.ensemble) {
+                    chartDatasets.push({
+                        label: 'Ensemble Forecast',
+                        data: data.forecasts.ensemble.forecast,
+                        borderColor: '#3498db',
+                        backgroundColor: getGradient(ctx, 'rgba(52, 152, 219, 0.2)'),
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        fill: true,
+                        spanGaps: true,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        order: 2
+                    });
+                }
+            }
+        }
+        
+        // If we want to compare multiple methods, uncomment this section
+        /*
+        if (method === 'compare') {
+            const methodColors = {
+                linear: '#3498db',
+                polynomial: '#e74c3c',
+                holt_winters: '#f39c12',
+                ensemble: '#9b59b6'
+            };
+            
+            Object.entries(data.forecasts).forEach(([forecastMethod, forecast], index) => {
+                const color = methodColors[forecastMethod] || `hsl(${index * 60}, 70%, 50%)`;
+                
+                chartDatasets.push({
+                    label: `${forecast.name} Forecast`,
+                    data: forecast.forecast,
+                    borderColor: color,
+                    backgroundColor: 'transparent',
+                    borderDash: [5, 5],
+                    tension: 0.4,
+                    fill: false,
+                    spanGaps: true,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    order: index + 2
+                });
+            });
+        }
+        */
+        
+        // Create the chart
+        window.forecastChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.labels,
+                datasets: chartDatasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Egg Production Forecast'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const value = context.parsed.y !== null ? context.parsed.y.toLocaleString() : '-';
+                                return `${label}: ${value} dozen eggs`;
+                            },
+                            afterLabel: function(context) {
+                                const index = context.dataIndex;
+                                const isForecast = context.dataset.label.includes('Forecast') || 
+                                                 context.dataset.label.includes('Bound');
+                                
+                                if (isForecast) {
+                                    return 'Predicted value';
+                                }
+                                
+                                const farmCount = data.farm_counts ? data.farm_counts[index] : null;
+                                return farmCount ? `Based on data from ${farmCount} farms` : '';
+                            }
+                        }
+                    },
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: 'Eggs (dozens)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Week'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Create custom legend
+        const legendContainer = document.getElementById('forecastCustomLegend');
+        legendContainer.innerHTML = '';
+        
+        // Add legend items based on datasets
+        chartDatasets.forEach(dataset => {
+            if (dataset.label && dataset.label !== 'Upper Bound (95%)' && dataset.label !== 'Lower Bound (95%)') {
+                const legendItem = document.createElement('div');
+                legendItem.className = 'legend-item';
+                
+                const colorBox = document.createElement('div');
+                colorBox.className = 'legend-color';
+                colorBox.style.backgroundColor = dataset.borderColor;
+                
+                const labelText = document.createElement('span');
+                labelText.textContent = dataset.label;
+                
+                legendItem.appendChild(colorBox);
+                legendItem.appendChild(labelText);
+                legendContainer.appendChild(legendItem);
+            }
+        });
+        
+        // Add confidence interval legend if applicable
+        if (chartDatasets.some(ds => ds.label === 'Upper Bound (95%)')) {
+            const legendItem = document.createElement('div');
+            legendItem.className = 'legend-item';
+            
+            const colorBox = document.createElement('div');
+            colorBox.className = 'legend-color';
+            colorBox.style.backgroundColor = 'rgba(52, 152, 219, 0.1)';
+            colorBox.style.border = '1px dashed rgba(52, 152, 219, 0.5)';
+            
+            const labelText = document.createElement('span');
+            labelText.textContent = 'Confidence Interval (95%)';
+            
+            legendItem.appendChild(colorBox);
+            legendItem.appendChild(labelText);
+            legendContainer.appendChild(legendItem);
+        }
+    }
+
+    async function renderAllAnalyticsCharts() {
+        try {
+            const data = await fetchWithFilters("{% url 'dashboard_analytics_data' %}");
+            renderFeedWater(data.feed_vs_water);
+            renderBreed(data.breed_distribution);
+            renderMortality(data.mortality_cull);
+            renderQuality(data.egg_quality);
+        } catch (err) {
+            console.error("Error loading analytics data:", err);
+        }
+    }
+
+    function renderFeedWater(data) {
+        const ctx = document.getElementById('feedWaterChart').getContext('2d');
+        destroyChartIfExists(window.feedChart);
+        
+        window.feedChart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [{ 
+                    label: 'Feed vs Water', 
+                    data: data.map(p => ({ x: p[0], y: p[1] })), 
+                    backgroundColor: '#3498db' 
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Feed (g/day)' } },
+                    y: { title: { display: true, text: 'Water (L/day)' } }
+                }
+            }
+        });
+    }
+
+    function renderBreed(breed) {
+        const ctx = document.getElementById('breedChart').getContext('2d');
+        destroyChartIfExists(window.breedChart);
+        
+        window.breedChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: breed.labels,
+                datasets: [{ 
+                    data: breed.data, 
+                    backgroundColor: ['#3498db', '#4CAF50', '#9b59b6', '#f1c40f', '#e74c3c', '#1abc9c'] 
+                }]
+            },
+            options: { 
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 12,
+                            font: { size: 10 }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function renderMortality(data) {
+        const ctx = document.getElementById('mortalityCullChart').getContext('2d');
+        destroyChartIfExists(window.mortalityChart);
+        
+        // Map breed codes to names for better readability
+        const breedNames = {
+            'LEGHORN': 'Leghorn',
+            'RHODE_ISLAND_RED': 'RI Red',
+            'PLYMOUTH_ROCK': 'Plymouth',
+            'AUSTRALORP': 'Australorp',
+            'ORPINGTON': 'Orpington',
+            'OTHER': 'Other'
+        };
+        
+        const labels = data.labels.map(breed => breedNames[breed] || breed);
+        
+        window.mortalityChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Mortality (%)', data: data.mortality, backgroundColor: '#e74c3c' },
+                    { label: 'Culled', data: data.culled, backgroundColor: '#f39c12' }
+                ]
+            },
+            options: { 
+                responsive: true, 
+                scales: { 
+                    y: { beginAtZero: true },
+                    x: { ticks: { maxRotation: 45, minRotation: 45 } }
+                } 
+            }
+        });
+    }
+
+    function renderQuality(data) {
+        const ctx = document.getElementById('eggQualityChart').getContext('2d');
+        destroyChartIfExists(window.qualityChart);
+        
+        window.qualityChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Defective (%)', 'First Grade (%)'],
+                datasets: [{ 
+                    data: [data.defective, data.first_grade], 
+                    backgroundColor: ['#e74c3c', '#4CAF50'] 
+                }]
+            },
+            options: { 
+                indexAxis: 'y', 
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    function renderEggSizeChart() {
+        const ctx = document.getElementById('eggSizeChart').getContext('2d');
+        destroyChartIfExists(window.eggSizeChart);
+        
+        window.eggSizeChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Small', 'Medium', 'Large', 'XL', 'Jumbo'],
+                datasets: [{
+                    data: [
+                        {{ egg_size_distribution.small|default:"0"|floatformat:1 }},
+                        {{ egg_size_distribution.medium|default:"0"|floatformat:1 }},
+                        {{ egg_size_distribution.large|default:"0"|floatformat:1 }},
+                        {{ egg_size_distribution.extra_large|default:"0"|floatformat:1 }},
+                        {{ egg_size_distribution.jumbo|default:"0"|floatformat:1 }}
+                    ],
+                    backgroundColor: ['#3498db', '#2ecc71', '#f1c40f', '#e67e22', '#9b59b6']
+                }]
+            },
+            options: { 
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw !== null ? context.raw.toLocaleString() : 0;
+                                return `${label}: ${value}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
 </body>
 </html>
 {% endblock %}

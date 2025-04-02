@@ -1,22 +1,12 @@
 {% load static %}
-{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Edit User</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #1a1a1a;
-            --secondary-color: #f4f4f4;
-            --text-primary: #333;
-            --text-secondary: #666;
-            --border-color: #e0e0e0;
-            --hover-bg: #f9f9f9;
-            --shadow-subtle: rgba(0, 0, 0, 0.1);
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -24,172 +14,369 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--secondary-color);
-            background-image: url("{% static 'img/HD-wallpaper-black-dark-gray-gray.jpg' %}");
+            font-family: 'Inter', Arial, sans-serif;
+            background: url("{% static 'img/5489297.jpg' %}") no-repeat center center fixed;
             background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: var(--text-primary);
+            color: #fff;
+            height: 100vh;
             line-height: 1.6;
-        }
-
-        .page-wrapper {
             display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: center;
+            position: relative;
         }
 
-        .header-title {
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        .back-btn {
-            padding: 8px 16px;
-            background-color: white;
-            color: var(--primary-color);
-            border: 1px solid var(--primary-color);
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 500;
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: -1;
         }
 
         .container {
+            display: flex;
+            height: 100vh;
             width: 100%;
-            max-width: 500px;
-            margin: 40px auto;
-            background: white;
+        }
+
+        .sidebar {
+            width: 40%;
+            background-color: #111;
+            color: #fff;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-right: 1px solid #333;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg, 
+                transparent, 
+                rgba(255,255,255,0.05), 
+                transparent
+            );
+            transform: rotate(-45deg);
+            pointer-events: none;
+        }
+
+        .sidebar h1 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .sidebar-description {
+            margin-bottom: 30px;
+            font-size: 15px;
+            color: #aaa;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .action-panel {
+            background-color: #111;
+            border: 1px solid #333;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            padding: 50px;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            transition: box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
             border-radius: 8px;
-            box-shadow: 0 4px 16px var(--shadow-subtle);
-            padding: 40px;
+        }
+
+        .action-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg, 
+                transparent, 
+                rgba(255,255,255,0.05), 
+                transparent
+            );
+            transform: rotate(-45deg);
+            pointer-events: none;
+        }
+
+        .action-panel:hover {
+            box-shadow: 0 12px 28px rgba(255, 255, 255, 0.1);
+        }
+
+        .action-panel h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .form-group {
             margin-bottom: 20px;
+            text-align: left;
         }
 
-        label {
+        .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-secondary);
+            color: #aaa;
+            font-size: 15px;
         }
 
-        input, 
-        select, 
-        textarea {
+        .form-group input {
             width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 16px;
+            padding: 14px;
+            background-color: #222;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 6px;
+            transition: all 0.3s ease;
         }
 
-        h2 {
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--text-primary);
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
+        .form-group input:focus {
+            outline: none;
+            border-color: #fff;
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.2);
+        }
+
+        /* Custom Checkbox Styling */
+        .staff-checkbox-container {
+            display: flex;
+            align-items: center;
             margin-bottom: 20px;
         }
 
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
+        .staff-checkbox-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin-right: 15px;
+        }
+
+        .staff-checkbox-wrapper input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .staff-checkbox-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #333;
+            transition: .4s;
+            border-radius: 34px;
+            border: 1px solid #444;
+        }
+
+        .staff-checkbox-slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .staff-checkbox-wrapper input:checked + .staff-checkbox-slider {
+            background-color: #fff;
+        }
+
+        .staff-checkbox-wrapper input:checked + .staff-checkbox-slider:before {
+            background-color: #111;
+            transform: translateX(26px);
+        }
+
+        .staff-checkbox-label {
+            color: #fff;
+            font-size: 15px;
+            margin-left: 10px;
         }
 
         .btn {
-            padding: 12px 24px;
-            border-radius: 4px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
+            width: 100%;
+            padding: 14px;
             border: none;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #000;
+            background-color: #fff;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border-radius: 6px;
         }
 
-        .btn-primary:hover {
-            background-color: #333;
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg, 
+                transparent, 
+                rgba(255,255,255,0.2), 
+                transparent
+            );
+            transition: all 0.5s ease;
         }
 
-        .btn-secondary {
-            background-color: transparent;
-            color: var(--text-secondary);
-            border: 1px solid var(--border-color);
+        .btn:hover::after {
+            left: 100%;
         }
 
-        .btn-secondary:hover {
-            background-color: var(--hover-bg);
-            color: var(--text-primary);
+        .btn:hover {
+            background-color: #e0e0e0;
+            box-shadow: 0 4px 15px rgba(255,255,255,0.2);
         }
 
-        .error-message {
-            color: #d32f2f;
+        .back-link {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            text-align: center;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #aaa;
+            text-shadow: 0 0 5px rgba(255,255,255,0.3);
+        }
+
+        .errorlist {
+            color: #e74c3c;
             font-size: 14px;
             margin-top: 5px;
         }
 
-        .validation-error {
-            border-color: #d32f2f;
-        }
-
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             .container {
-                margin: 20px;
-                padding: 30px 20px;
+                flex-direction: column;
             }
 
-            .action-buttons {
-                flex-direction: column;
-                gap: 15px;
+            .sidebar, .main-content {
+                width: 100%;
+                padding: 30px;
+            }
+
+            .action-panel {
+                max-width: 100%;
             }
         }
     </style>
 </head>
 <body>
-    <div class="page-wrapper">
-        <div class="header">
-            <div class="header-title">Edit User</div>
-            <a href="{% url 'user_list' %}" class="back-btn">← Back</a>
+    <div class="container">
+        <div class="sidebar">
+            <h1>User Management</h1>
+            <p class="sidebar-description">
+                Edit and update user account details for your Egg Farm Data Management system. Modify user information securely and efficiently.
+            </p>
         </div>
-
-        <div class="container">
-            <h2>Edit User: <strong>{{ user.username }}</strong></h2>
-            <form method="POST">
-                {% csrf_token %}
-                {% for field in form %}
-                    <div class="form-group">
-                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.errors %}
-                            <div class="error-message">{{ field.errors }}</div>
+        <div class="main-content">
+            <div class="action-panel">
+                <h2>Edit User: {{ user.username }}</h2>
+                <form method="POST">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        {% if field.name != 'is_staff' %}
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                                {% for error in field.errors %}
+                                    <div class="errorlist">{{ error }}</div>
+                                {% endfor %}
+                            </div>
                         {% endif %}
+                    {% endfor %}
                     
-                {% endfor %}
-                <div class="action-buttons">
-                    <a href="{% url 'user_list' %}" class="btn btn-secondary">Cancel</a>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </div>
-            </form>
+                    <div class="staff-checkbox-container">
+                        <div class="staff-checkbox-wrapper">
+                            {{ form.is_staff }}
+                            <span class="staff-checkbox-slider"></span>
+                        </div>
+                        <label class="staff-checkbox-label" for="{{ form.is_staff.id_for_label }}">Staff Member</label>
+                    </div>
+
+                    <button type="submit" class="btn">Save Changes</button>
+                    <a href="{% url 'user_list' %}" class="back-link">← Back to User List</a>
+                </form>
+            </div>
         </div>
     </div>
+
+    <script>
+        // Add JavaScript to ensure toggle works
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkbox = document.getElementById('{{ form.is_staff.id_for_label }}');
+            const slider = checkbox.nextElementSibling;
+
+            // Ensure initial state is correct
+            if (checkbox.checked) {
+                slider.classList.add('checked');
+            }
+
+            // Add click event to slider to toggle checkbox
+            slider.addEventListener('click', function() {
+                checkbox.checked = !checkbox.checked;
+                
+                // Trigger change event manually
+                const event = new Event('change', { bubbles: true });
+                checkbox.dispatchEvent(event);
+            });
+
+            // Optional: Add keyboard support
+            slider.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    checkbox.checked = !checkbox.checked;
+                    const event = new Event('change', { bubbles: true });
+                    checkbox.dispatchEvent(event);
+                }
+            });
+
+            // Make slider focusable
+            slider.tabIndex = 0;
+        });
+    </script>
 </body>
 </html>
-{% endblock %}

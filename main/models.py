@@ -92,7 +92,7 @@ class EggFarm(models.Model):
     )
     seasonal_trend_notes = models.TextField(null=True, blank=True)
 
-    # Production Date (NEW FIELD for forecast)
+    # Production Date (IMPORTANT field for forecast)
     production_date = models.DateField(help_text="Date representing the week of production", null=True, blank=True)
 
     # Timestamp for record keeping
@@ -100,9 +100,15 @@ class EggFarm(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.farm_name} - {self.site_name} - House {self.hen_house_number}"
+        return f"{self.farm_name} - {self.site_name} - House {self.hen_house_number} ({self.production_date})"
 
     class Meta:
         verbose_name = "Egg Farm Record"
         verbose_name_plural = "Egg Farm Records"
-        unique_together = ['farm_name', 'site_name', 'hen_house_number']
+        # MODIFIED: Include production_date in unique_together
+        unique_together = ['farm_name', 'site_name', 'hen_house_number', 'production_date']
+        # Add index for faster querying
+        indexes = [
+            models.Index(fields=['production_date']),
+            models.Index(fields=['farm_name', 'site_name', 'hen_house_number']),
+        ]

@@ -1,23 +1,12 @@
 {% load static %}
-{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Delete User</title>
+    <title>Confirm Delete User</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #1a1a1a;
-            --secondary-color: #f4f4f4;
-            --text-primary: #333;
-            --text-secondary: #666;
-            --border-color: #e0e0e0;
-            --hover-bg: #f9f9f9;
-            --shadow-subtle: rgba(0, 0, 0, 0.1);
-            --delete-color: #d32f2f;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -25,135 +14,162 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--secondary-color);
-            background-image: url("{% static 'img/HD-wallpaper-black-dark-gray-gray.jpg' %}");
+            font-family: 'Inter', Arial, sans-serif;
+            background: url("{% static 'img/5489297.jpg' %}") no-repeat center center fixed;
             background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: var(--text-primary);
+            color: #fff;
+            height: 100vh;
             line-height: 1.6;
+            position: relative;
         }
 
-        .page-wrapper {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-title {
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        .back-btn {
-            padding: 8px 16px;
-            background-color: white;
-            color: var(--primary-color);
-            border: 1px solid var(--primary-color);
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 500;
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: -1;
         }
 
         .container {
+            display: flex;
+            height: 100vh;
             width: 100%;
-            max-width: 500px;
-            margin: 40px auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 16px var(--shadow-subtle);
-            padding: 40px;
-            text-align: center;
+            align-items: center;
+            justify-content: center;
         }
 
-        h2 {
+        .delete-panel {
+            background-color: #111;
+            border: 1px solid #333;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            padding: 50px;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            transition: box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .delete-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg, 
+                transparent, 
+                rgba(255,255,255,0.05), 
+                transparent
+            );
+            transform: rotate(-45deg);
+            pointer-events: none;
+        }
+
+        .delete-panel:hover {
+            box-shadow: 0 12px 28px rgba(255, 255, 255, 0.1);
+        }
+
+        .delete-panel h2 {
+            margin-bottom: 30px;
             font-size: 24px;
             font-weight: 600;
-            color: var(--text-primary);
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        h2 strong {
-            color: var(--delete-color);
+        .delete-panel h2 strong {
+            color: #ff6b6b;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 15px;
+            border-radius: 6px;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg, 
+                transparent, 
+                rgba(255,255,255,0.2), 
+                transparent
+            );
+            transition: all 0.5s ease;
+        }
+
+        .btn:hover::after {
+            left: 100%;
+        }
+
+        .btn-cancel {
+            background-color: #fff;
+            color: #000;
+        }
+
+        .btn-cancel:hover {
+            background-color: #e0e0e0;
+            box-shadow: 0 4px 15px rgba(255,255,255,0.2);
+        }
+
+        .btn-delete {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+
+        .btn-delete:hover {
+            background-color: #c0392b;
+            box-shadow: 0 4px 15px rgba(231,76,60,0.3);
         }
 
         .action-buttons {
             display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
+            gap: 15px;
         }
 
-        .btn {
-            padding: 12px 24px;
-            border-radius: 4px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-delete {
-            background-color: var(--delete-color);
-            color: white;
-            border: none;
-        }
-
-        .btn-delete:hover {
-            background-color: #b71c1c;
-        }
-
-        .btn-secondary {
-            background-color: transparent;
-            color: var(--text-secondary);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--hover-bg);
-            color: var(--text-primary);
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                margin: 20px;
-                padding: 30px 20px;
+        @media (max-width: 768px) {
+            .delete-panel {
+                max-width: 90%;
+                padding: 30px;
             }
 
             .action-buttons {
                 flex-direction: column;
-                gap: 15px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="page-wrapper">
-        <div class="header">
-            <div class="header-title">Delete User</div>
-            <a href="{% url 'user_list' %}" class="back-btn">← Back</a>
-        </div>
-
-        <div class="container">
-            <h2>Are you sure you want to delete <strong>{{ user.username }}</strong>?</h2>
+    <div class="container">
+        <div class="delete-panel">
+            <h2>Are you sure you want to delete <strong>{{ user_obj.username }}</strong>?</h2>
             <form method="POST" class="action-buttons">
                 {% csrf_token %}
-                <a href="{% url 'user_list' %}" class="btn btn-secondary">Cancel</a>
+                <a href="{% url 'user_list' %}" class="btn btn-cancel">Cancel</a>
                 <button type="submit" class="btn btn-delete">Yes, Delete</button>
             </form>
         </div>
     </div>
 </body>
 </html>
-{% endblock %}

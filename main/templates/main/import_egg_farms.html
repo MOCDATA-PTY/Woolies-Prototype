@@ -6,69 +6,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Import Egg Farm Data</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root {
-            --primary: #1a1a1a;
-            --secondary: #2c3e50;
-            --background: #f4f6f9;
-            --text-dark: #333;
-            --text-light: #6c757d;
-            --border: #dee2e6;
-        }
-
         * {
             box-sizing: border-box;
-            transition: all 0.3s ease;
+            margin: 0;
+            padding: 0;
         }
 
         body {
+            font-family: 'Inter', Arial, sans-serif;
+            background: url("{% static 'img/5489297.jpg' %}") no-repeat center center fixed;
             background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
-            color: var(--text-dark);
+            color: #fff;
             line-height: 1.6;
+            position: relative;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
             padding: 20px;
-            background-image: 
-                linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), 
-                url("{% static 'images/farm_bg.jpg' %}");
         }
 
-        /* Fallback if no background is provided */
-        body.no-background {
-            background-image: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: -1;
         }
 
         .page-container {
             width: 100%;
             max-width: 500px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            overflow: hidden;
+            background-color: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
         }
 
         .page-header {
-            background: var(--primary);
-            color: white;
+            background-color: #111;
+            color: #fff;
             padding: 20px;
             text-align: center;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid #333;
         }
 
         .page-header h1 {
             margin: 0;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             font-weight: 600;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .content-area {
@@ -81,10 +78,11 @@
         }
 
         .upload-section h2 {
-            color: var(--secondary);
+            color: #fff;
             margin-bottom: 15px;
             font-size: 1.5rem;
-            font-weight: 700;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .file-input-wrapper {
@@ -104,33 +102,32 @@
         }
 
         .file-drop-area {
-            border: 2px dashed var(--border);
+            border: 2px dashed #444;
             border-radius: 8px;
             padding: 30px;
-            background-color: rgba(255,255,255,0.7);
-            transition: all 0.3s ease;
+            background-color: #222;
         }
 
         .file-drop-area:hover {
-            border-color: var(--secondary);
-            background-color: rgba(255,255,255,0.9);
+            border-color: #555;
+            background-color: #2a2a2a;
         }
 
         .file-drop-area i {
-            color: var(--text-light);
+            color: #fff;
             font-size: 3rem;
             margin-bottom: 15px;
         }
 
         .file-name {
-            color: var(--text-light);
+            color: #aaa;
             margin-top: 10px;
             word-break: break-all;
         }
 
         .btn-import {
-            background-color: var(--primary);
-            color: white;
+            background-color: #fff;
+            color: #000;
             border: none;
             padding: 12px 20px;
             border-radius: 6px;
@@ -138,25 +135,37 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            cursor: pointer;
         }
 
         .btn-import:hover {
-            background-color: var(--secondary);
+            background-color: #e0e0e0;
         }
 
         .btn-back {
-            background: transparent;
-            color: var(--text-light);
-            border: 1px solid var(--border);
-            padding: 6px 12px;
-            border-radius: 4px;
-            position: absolute;
-            top: 15px;
-            right: 15px;
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .btn-back:hover {
-            background-color: rgba(0,0,0,0.05);
+            background-color: #444;
+        }
+
+        .file-selected {
+            border-color: #555;
+            background-color: #2a2a2a;
+        }
+
+        .dragover {
+            border-color: #777;
+            background-color: #333;
         }
 
         @media (max-width: 576px) {
@@ -170,18 +179,16 @@
             }
 
             .btn-back {
-                position: static;
                 margin-top: 10px;
-                align-self: center;
             }
         }
     </style>
 </head>
-<body class="{% if not background_image %}no-background{% endif %}">
+<body>
     <div class="page-container">
         <div class="page-header">
             <h1>Egg Farm Data Import</h1>
-            <a href="{% url 'home' %}" class="btn btn-back">
+            <a href="{% url 'home' %}" class="btn-back">
                 <i class="fas fa-arrow-left me-2"></i> Back
             </a>
         </div>
@@ -240,6 +247,7 @@
                 fileInput.files = files;
                 if (files.length > 0) {
                     fileName.textContent = files[0].name;
+                    fileDropArea.classList.add('file-selected');
                 }
             });
         });
